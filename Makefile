@@ -87,14 +87,17 @@ KONCEPT_FILES = $(KONCEPT_CH01_FILES) $(KONCEPT_CH02_FILES) \
 	$(KONCEPT_CH15_FILES) $(KONCEPT_CH16_FILES) \
 	$(KONCEPT_APDX_FILES) $(KONCEPT_OTHER_FILES)
 
-koncept.aux: koncept.tex $(KONCEPT_FILES)
+revision.tex:
+	echo "\\newcommand{\\gitcommit}{$(shell git rev-parse HEAD)}" > revision.tex
+
+koncept.aux: koncept.tex revision.tex $(KONCEPT_FILES)
 	- pdflatex koncept.tex
 #	- xelatex koncept.tex
 
-koncept.idx: koncept.tex koncept.aux $(KONCEPT_FILES)
+koncept.idx: koncept.tex koncept.aux revision.tex $(KONCEPT_FILES)
 	- xelatex koncept.tex
 
-koncept.bbl: koncept.aux koncept.bib
+koncept.bbl: koncept.aux koncept.bib revision.tex
 	pdflatex koncept-tryck.tex
 	bibtex koncept-tryck.aux
 #	bibtex koncept.aux
@@ -103,7 +106,7 @@ koncept.ind: koncept.idx
 	makeindex koncept.idx
 
 koncept.log:
-koncept.pdf: koncept.aux koncept.bbl koncept.ind koncept.tex $(KONCEPT_FILES)
+koncept.pdf: koncept.aux koncept.bbl koncept.ind koncept.tex revision.tex $(KONCEPT_FILES)
 	pdflatex koncept.tex
 	pdflatex koncept.tex
 	makeindex koncept.idx
