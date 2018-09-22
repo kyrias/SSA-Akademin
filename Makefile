@@ -204,7 +204,7 @@ docker-image:
 	docker build -t ${DOCKER_IMAGE_NAME} .
 
 docker-build:
-	docker run -ti --rm -v $(shell pwd):/work -w /work ${DOCKER_IMAGE_NAME} make all
+	docker run -ti --rm -v $(shell pwd):/work -w /work ${DOCKER_IMAGE_NAME} make SOURCE_DATE_EPOCH=0 all
 
 clean: SHELL=/bin/bash -O extglob -c
 clean:

@@ -1,36 +1,23 @@
+sudo: required
+
 language: generic
 
-before_install:
-  - sudo apt-get -qq update
-  - "sudo apt-get install -y -qq \
-    texlive \
-    texlive-lang-european \
-    texlive-latex-extra \
-    texlive-fonts-extra \
-    texlive-pictures \
-    texlive-math-extra \
-    texlive-xetex \
-    sshpass"
+services:
+  - docker
+
+before_script:
+  - make docker-image
 
 script:
-  - make koncept.pdf
+  - make docker-build
 
 after_success:
   - sha256sum koncept.pdf
-  - sshpass -e scp koncept.pdf ${FTP_USER}@${FTP_SERVER}:${FTP_FOLDER}koncept-pdf/koncept.$(cat VERSION.txt)+b$(printf "%04d" "${TRAVIS_BUILD_NUMBER}").${TRAVIS_COMMIT:0:7}.pdf
-  - sshpass -e ssh ${FTP_USER}@${FTP_SERVER} ln -sf \~/${FTP_FOLDER}koncept-pdf/koncept.$(cat VERSION.txt)+b$(printf "%04d" "${TRAVIS_BUILD_NUMBER}").${TRAVIS_COMMIT:0:7}.pdf \~/${FTP_FOLDER}koncept-pdf/koncept.pdf
 
 deploy:
   provider: releases
   api_key:
-    secure: [YOUR KEY]
-  file:
-    koncept.pdf
-  skip_cleanup: true
+    secure: ZSvk5GlQ7Aa45kiP6uK/141bD3jEbf2iye25crHkchO0tdqJzGhlrH3reIRaOco/hhzHrCkq010nHp8ozODcXoO7XoNEp5kpVj7Nv1tyap7dlr98rQPyapzi8TagRUBzKpKsCP++w0tYJAD95zyB2g8X3GkrSEcQ3DyO4NH4gSr6aGGLaD70wI+VmNPFl9TPRCzBgQdws8XXDIRYUHeTkGsUEXOnhOjngoQ3wUyJGjD89Cv7ajF4A+uviI/cc/eTD0N3woYySUP46C13DYfzyuax/mHcNbAVBV6c6vnfpK9tHLDVPhBQgkT83ve8wVNq9bhXrvQw3OFTvGfsJRA4Vl7N10opfiqZz/nuMup1Zm6OaqS0BkZsbBux4zn73hKReu/r/lrNP04bMO7qP5VCeEA9cpFGje42BKRwpYCunTZOQj2IxmW4xG9aSQGK2qKepn2sMIPzng/KAyEx5ouJso/4KAJeNfMVTg+OEiJRiHVKV1/3JCDfIYx/10N4Yv+LYdPZtRwnauOauVaRK02ICDVkfISSAmtbz7mxs4i9g3dYOiVrSHEuZ8WLHjFITvjZneIH6MKyr/lQW8bst/o5hm3OeFC8EuksfBq5cGXWPEJMqcAnxuoPGYuGSQzD6fEjMIiupRy8CmoZXTgku788Eg8FiA8BKcyrKn2VhcTIahk=
+  file: koncept.pdf
   on:
-    tags: true
-
-addons:
-  ssh_known_hosts:
-  - akademin.ssa.se
-  - 89.221.240.114
+    repo: kyrias/SSA-Akademin
